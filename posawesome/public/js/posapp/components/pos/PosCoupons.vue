@@ -14,7 +14,7 @@
               dense
               outlined
               color="primary"
-              :label="frappe._('Coupon')"
+              :label="__('Coupon')"
               background-color="white"
               hide-details
               v-model="new_coupon"
@@ -107,7 +107,7 @@ export default {
 
   methods: {
     back_to_invoice() {
-      evntBus.$emit('show_coupons', 'false');
+      evntBus.emit('show_coupons', 'false');
     },
     add_coupon(new_coupon) {
       if (!this.customer || !new_coupon) return;
@@ -115,7 +115,7 @@ export default {
         (el) => el.coupon_code == new_coupon
       );
       if (exist) {
-        evntBus.$emit('show_mesage', {
+        evntBus.emit('show_mesage', {
           text: __('This coupon already used !'),
           color: 'error',
         });
@@ -133,7 +133,7 @@ export default {
           if (r.message) {
             const res = r.message;
             if (res.msg != 'Apply' || !res.coupon) {
-              evntBus.$emit('show_mesage', {
+              evntBus.emit('show_mesage', {
                 text: res.msg,
                 color: 'error',
               });
@@ -192,10 +192,10 @@ export default {
       );
     },
     updateInvoice() {
-      evntBus.$emit('update_invoice_coupons', this.posa_coupons);
+      evntBus.emit('update_invoice_coupons', this.posa_coupons);
     },
     updateCounters() {
-      evntBus.$emit('update_coupons_counters', {
+      evntBus.emit('update_coupons_counters', {
         couponsCount: this.couponsCount,
         appliedCouponsCount: this.appliedCouponsCount,
       });
@@ -214,11 +214,11 @@ export default {
 
   created: function () {
     this.$nextTick(function () {
-      evntBus.$on('register_pos_profile', (data) => {
+      evntBus.on('register_pos_profile', (data) => {
         this.pos_profile = data.pos_profile;
       });
     });
-    evntBus.$on('update_customer', (customer) => {
+    evntBus.on('update_customer', (customer) => {
       if (this.customer != customer) {
         const to_remove = [];
         this.posa_coupons.forEach((el) => {
@@ -235,10 +235,10 @@ export default {
       }
       this.setActiveGiftCoupons();
     });
-    evntBus.$on('update_pos_coupons', (data) => {
+    evntBus.on('update_pos_coupons', (data) => {
       this.updatePosCoupons(data);
     });
-    evntBus.$on('set_pos_coupons', (data) => {
+    evntBus.on('set_pos_coupons', (data) => {
       this.posa_coupons = data;
     });
   },

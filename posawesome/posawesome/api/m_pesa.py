@@ -20,7 +20,7 @@ def get_token(app_key, app_secret, base_url):
 @frappe.whitelist(allow_guest=True)
 def confirmation(**kwargs):
     try:
-        args = frappe._dict(kwargs)
+        args = __dict(kwargs)
         doc = frappe.new_doc("Mpesa Payment Register")
         doc.transactiontype = args.get("TransactionType")
         doc.transid = args.get("TransID")

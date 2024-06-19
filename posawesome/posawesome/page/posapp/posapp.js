@@ -18,7 +18,7 @@ frappe.pages['posapp'].on_page_load = function (wrapper) {
 //Only if PT as we are not being able to load from pt.csv
 if (frappe.boot.lang == "pt") {
 	$.extend(
-		frappe._messages, {
+		__messages, {
 		"Type": "Tipo",
 		"is Offer": "é Oferta",
 		"Total Qty": "Qtd Total",

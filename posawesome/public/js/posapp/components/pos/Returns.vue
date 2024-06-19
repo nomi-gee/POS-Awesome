@@ -11,7 +11,7 @@
           <v-row class="mb-4">
             <v-text-field
               color="primary"
-              :label="frappe._('Invoice ID')"
+              :label="__('Invoice ID')"
               background-color="white"
               hide-details
               v-model="invoice_name"
@@ -147,13 +147,13 @@ export default {
         invoice_doc.return_against = return_doc.name;
         invoice_doc.customer = return_doc.customer;
         const data = { invoice_doc, return_doc };
-        evntBus.$emit('load_return_invoice', data);
+        evntBus.emit('load_return_invoice', data);
         this.invoicesDialog = false;
       }
     },
   },
   created: function () {
-    evntBus.$on('open_returns', (data) => {
+    evntBus.on('open_returns', (data) => {
       this.invoicesDialog = true;
       this.company = data;
       this.invoice_name = '';

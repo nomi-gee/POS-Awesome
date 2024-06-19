@@ -51,7 +51,7 @@
                       outlined
                       dense
                       color="primary"
-                      :label="frappe._('Give Item')"
+                      :label="__('Give Item')"
                       :disabled="
                         item.apply_type != 'Item Group' ||
                         item.replace_item ||
@@ -122,7 +122,7 @@ export default {
 
   methods: {
     back_to_invoice() {
-      evntBus.$emit('show_offers', 'false');
+      evntBus.emit('show_offers', 'false');
     },
     forceUpdateItem() {
       let list_offers = [];
@@ -200,7 +200,7 @@ export default {
             newOffer.give_item = this.get_give_items(newOffer)[0].item_code;
           }
           this.pos_offers.push(newOffer);
-          evntBus.$emit('show_mesage', {
+          evntBus.emit('show_mesage', {
             text: __('New Offer Available'),
             color: 'warning',
           });
@@ -216,7 +216,7 @@ export default {
       const applyedOffers = this.pos_offers.filter(
         (offer) => offer.offer_applied
       );
-      evntBus.$emit('update_invoice_offers', applyedOffers);
+      evntBus.emit('update_invoice_offers', applyedOffers);
     },
     handleNewLine(str) {
       if (str) {
@@ -247,7 +247,7 @@ export default {
       }
     },
     updateCounters() {
-      evntBus.$emit('update_offers_counters', {
+      evntBus.emit('update_offers_counters', {
         offersCount: this.offersCount,
         appliedOffersCount: this.appliedOffersCount,
       });
@@ -256,7 +256,7 @@ export default {
       const applyedOffers = this.pos_offers.filter(
         (offer) => offer.offer_applied && offer.coupon_based
       );
-      evntBus.$emit('update_pos_coupons', applyedOffers);
+      evntBus.emit('update_pos_coupons', applyedOffers);
     },
   },
 
@@ -273,22 +273,22 @@ export default {
 
   created: function () {
     this.$nextTick(function () {
-      evntBus.$on('register_pos_profile', (data) => {
+      evntBus.on('register_pos_profile', (data) => {
         this.pos_profile = data.pos_profile;
       });
     });
-    evntBus.$on('update_customer', (customer) => {
+    evntBus.on('update_customer', (customer) => {
       if (this.customer != customer) {
         this.offers = [];
       }
     });
-    evntBus.$on('update_pos_offers', (data) => {
+    evntBus.on('update_pos_offers', (data) => {
       this.updatePosOffers(data);
     });
-    evntBus.$on('update_discount_percentage_offer_name', (data) => {
+    evntBus.on('update_discount_percentage_offer_name', (data) => {
       this.discount_percentage_offer_name = data.value;
     });
-    evntBus.$on('set_all_items', (data) => {
+    evntBus.on('set_all_items', (data) => {
       this.allItems = data;
     });
   },

@@ -9,7 +9,7 @@
           <v-row class="mb-4">
             <v-text-field
               color="primary"
-              :label="frappe._('Full Name')"
+              :label="__('Full Name')"
               background-color="white"
               hide-details
               v-model="full_name"
@@ -19,7 +19,7 @@
             ></v-text-field>
             <v-text-field
               color="primary"
-              :label="frappe._('Mobile No')"
+              :label="__('Mobile No')"
               background-color="white"
               hide-details
               v-model="mobile_no"
@@ -151,7 +151,7 @@ export default {
           async: false,
           callback: function (r) {
             if (!r.exc) {
-              evntBus.$emit('set_mpesa_payment', r.message);
+              evntBus.emit('set_mpesa_payment', r.message);
               vm.dialog = false;
             }
           },
@@ -164,7 +164,7 @@ export default {
     },
   },
   created: function () {
-    evntBus.$on('open_mpesa_payments', (data) => {
+    evntBus.on('open_mpesa_payments', (data) => {
       this.dialog = true;
       this.full_name = '';
       this.mobile_no = '';

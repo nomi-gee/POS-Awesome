@@ -99,13 +99,13 @@ export default {
 
     submit_dialog() {
       if (this.selected.length > 0) {
-        evntBus.$emit('load_invoice', this.selected[0]);
+        evntBus.emit('load_invoice', this.selected[0]);
         this.draftsDialog = false;
       }
     },
   },
   created: function () {
-    evntBus.$on('open_drafts', (data) => {
+    evntBus.on('open_drafts', (data) => {
       this.draftsDialog = true;
       this.dialog_data = data;
     });

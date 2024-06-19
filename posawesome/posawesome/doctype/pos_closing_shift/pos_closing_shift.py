@@ -191,7 +191,7 @@ def make_closing_shift_from_opening(opening_shift):
                 existing_tax[0].amount += flt(t.tax_amount)
             else:
                 taxes.append(
-                    frappe._dict(
+                    __dict(
                         {
                             "account_head": t.account_head,
                             "rate": t.rate,
@@ -219,7 +219,7 @@ def make_closing_shift_from_opening(opening_shift):
                 existing_pay[0].expected_amount += flt(amount)
             else:
                 payments.append(
-                    frappe._dict(
+                    __dict(
                         {
                             "mode_of_payment": p.mode_of_payment,
                             "opening_amount": 0,
@@ -232,7 +232,7 @@ def make_closing_shift_from_opening(opening_shift):
 
     for py in pos_payments:
         pos_payments_table.append(
-            frappe._dict(
+            __dict(
                 {
                     "payment_entry": py.name,
                     "mode_of_payment": py.mode_of_payment,
@@ -249,7 +249,7 @@ def make_closing_shift_from_opening(opening_shift):
             existing_pay[0].expected_amount += flt(py.paid_amount)
         else:
             payments.append(
-                frappe._dict(
+                __dict(
                     {
                         "mode_of_payment": py.mode_of_payment,
                         "opening_amount": 0,

@@ -16,7 +16,7 @@
               <v-col cols="12">
                 <v-autocomplete
                   :items="companies"
-                  :label="frappe._('Company')"
+                  :label="__('Company')"
                   v-model="company"
                   required
                 ></v-autocomplete>
@@ -24,13 +24,12 @@
               <v-col cols="12">
                 <v-autocomplete
                   :items="pos_profiles"
-                  :label="frappe._('POS Profile')"
+                  :label="__('POS Profile')"
                   v-model="pos_profile"
                   required
                 ></v-autocomplete>
               </v-col>
               <v-col cols="12">
-                <template>
                   <v-data-table
                     :headers="payments_methods_headers"
                     :items="payments_methods"
@@ -39,24 +38,8 @@
                     :items-per-page="itemsPerPage"
                     hide-default-footer
                   >
-                    <template v-slot:item.amount="props">
-                      <v-edit-dialog :return-value.sync="props.item.amount">
-                        {{ currencySymbol(props.item.currency) }}
-                        {{ formtCurrency(props.item.amount) }}
-                        <template v-slot:input>
-                          <v-text-field
-                            v-model="props.item.amount"
-                            :rules="[max25chars]"
-                            :label="frappe._('Edit')"
-                            single-line
-                            counter
-                            type="number"
-                          ></v-text-field>
-                        </template>
-                      </v-edit-dialog>
-                    </template>
+                    
                   </v-data-table>
-                </template>
               </v-col>
             </v-row>
           </v-container>
@@ -97,15 +80,21 @@ export default {
       payments_methods: [],
       payments_methods_headers: [
         {
-          text: __('Mode of Payment'),
+          title: __('Mode of Payment'),
           align: 'start',
           sortable: false,
-          value: 'mode_of_payment',
+          key: 'mode_of_payment',
         },
         {
-          text: __('Opening Amount'),
-          value: 'amount',
-          align: 'center',
+          title: __('Opening Amount'),
+          key: 'amount',
+          align: 'start',
+          sortable: false,
+        },
+        {
+          title: __('Curreny'),
+          key: 'currency',
+          align: 'start',
           sortable: false,
         },
       ],
@@ -146,7 +135,7 @@ export default {
   },
   methods: {
     close_opening_dialog() {
-      evntBus.$emit('close_opening_dialog');
+      evntBus.emit('close_opening_dialog');
     },
     get_opening_dialog_data() {
       const vm = this;
@@ -179,8 +168,8 @@ export default {
         })
         .then((r) => {
           if (r.message) {
-            evntBus.$emit('register_pos_data', r.message);
-            evntBus.$emit('set_company', r.message.company);
+            evntBus.emit('register_pos_data', r.message);
+            evntBus.emit('set_company', r.message.company);
             vm.close_opening_dialog();
             is_loading = false;
           }

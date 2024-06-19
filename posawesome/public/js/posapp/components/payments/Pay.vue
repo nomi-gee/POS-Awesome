@@ -155,7 +155,7 @@
                   dense
                   outlined
                   color="primary"
-                  :label="frappe._('Search by Name')"
+                  :label="__('Search by Name')"
                   background-color="white"
                   hide-details
                   v-model="mpesa_search_name"
@@ -167,7 +167,7 @@
                   dense
                   outlined
                   color="primary"
-                  :label="frappe._('Search by Mobile')"
+                  :label="__('Search by Mobile')"
                   background-color="white"
                   hide-details
                   v-model="mpesa_search_mobile"
@@ -497,8 +497,8 @@ export default {
             this.pos_profile = r.message.pos_profile;
             this.pos_opening_shift = r.message.pos_opening_shift;
             this.company = r.message.company.name;
-            evntBus.$emit("payments_register_pos_profile", r.message);
-            evntBus.$emit("set_company", r.message.company);
+            evntBus.emit("payments_register_pos_profile", r.message);
+            evntBus.emit("set_company", r.message.company);
             this.set_payment_methods();
             this.pos_profile_search = r.message.pos_profile.name;
             this.pos_profiles_list.push(this.pos_profile_search);
@@ -549,14 +549,14 @@ export default {
                 ...message,
               };
               vm.set_mpesa_search_params();
-              evntBus.$emit("set_customer_info_to_edit", vm.customer_info);
+              evntBus.emit("set_customer_info_to_edit", vm.customer_info);
             }
           },
         });
       }
     },
     onInvoiceSelected(event) {
-      evntBus.$emit("set_customer", event.item.customer);
+      evntBus.emit("set_customer", event.item.customer);
     },
     get_outstanding_invoices() {
       this.invoices_loading = true;
@@ -776,7 +776,7 @@ export default {
   mounted: function () {
     this.$nextTick(function () {
       this.check_opening_entry();
-      evntBus.$on("update_customer", (customer_name) => {
+      evntBus.on("update_customer", (customer_name) => {
         this.clear_all(true);
         this.customer_name = customer_name;
         this.fetch_customer_details();
@@ -784,7 +784,7 @@ export default {
         this.get_unallocated_payments();
         this.get_draft_mpesa_payments_register();
       });
-      evntBus.$on("fetch_customer_details", () => {
+      evntBus.on("fetch_customer_details", () => {
         this.fetch_customer_details();
       });
     });

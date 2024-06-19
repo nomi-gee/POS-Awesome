@@ -14,7 +14,7 @@
                 <v-text-field
                   dense
                   color="primary"
-                  :label="frappe._('Address Name')"
+                  :label="__('Address Name')"
                   background-color="white"
                   hide-details
                   v-model="address.name"
@@ -24,7 +24,7 @@
                 <v-text-field
                   dense
                   color="primary"
-                  :label="frappe._('Address Line 1')"
+                  :label="__('Address Line 1')"
                   background-color="white"
                   hide-details
                   v-model="address.address_line1"
@@ -34,7 +34,7 @@
                 <v-text-field
                   dense
                   color="primary"
-                  :label="frappe._('Address Line 2')"
+                  :label="__('Address Line 2')"
                   background-color="white"
                   hide-details
                   v-model="address.address_line2"
@@ -101,8 +101,8 @@ export default {
         },
         callback: (r) => {
           if (!r.exc) {
-            evntBus.$emit('add_the_new_address', r.message);
-            evntBus.$emit('show_mesage', {
+            evntBus.emit('add_the_new_address', r.message);
+            evntBus.emit('show_mesage', {
               text: 'Customer Address created successfully.',
               color: 'success',
             });
@@ -115,7 +115,7 @@ export default {
     },
   },
   created: function () {
-    evntBus.$on('open_new_address', (data) => {
+    evntBus.on('open_new_address', (data) => {
       this.addressDialog = true;
       this.customer = data;
     });

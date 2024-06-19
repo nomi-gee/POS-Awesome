@@ -30,7 +30,7 @@
                           <v-text-field
                             v-model="props.item.closing_amount"
                             :rules="[max25chars]"
-                            :label="frappe._('Edit')"
+                            :label="__('Edit')"
                             single-line
                             counter
                             type="number"
@@ -114,17 +114,17 @@ export default {
       this.closingDialog = false;
     },
     submit_dialog() {
-      evntBus.$emit('submit_closing_pos', this.dialog_data);
+      evntBus.emit('submit_closing_pos', this.dialog_data);
       this.closingDialog = false;
     },
   },
 
   created: function () {
-    evntBus.$on('open_ClosingDialog', (data) => {
+    evntBus.on('open_ClosingDialog', (data) => {
       this.closingDialog = true;
       this.dialog_data = data;
     });
-    evntBus.$on('register_pos_profile', (data) => {
+    evntBus.on('register_pos_profile', (data) => {
       this.pos_profile = data.pos_profile;
       if (!this.pos_profile.hide_expected_amount) {
         this.headers.push({

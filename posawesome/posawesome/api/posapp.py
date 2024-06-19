@@ -15,7 +15,6 @@ from erpnext.accounts.party import get_party_bank_account
 from erpnext.stock.doctype.batch.batch import (
     get_batch_no,
     get_batch_qty,
-    set_batch_nos,
 )
 from erpnext.accounts.doctype.payment_request.payment_request import (
     get_dummy_message,
@@ -685,6 +684,23 @@ def set_batch_nos_for_bundels(doc, warehouse_field, throw=False):
                 d.batch_no = get_batch_no(
                     d.item_code, warehouse, qty, throw, d.serial_no
                 )
+            else:
+                batch_qty = get_batch_qty(batch_no=d.batch_no, warehouse=warehouse)
+                if flt(batch_qty, d.precision("qty")) < flt(qty, d.precision("qty")):
+                    frappe.throw(
+                        _(
+                            "Row #{0}: The batch {1} has only {2} qty. Please select another batch which has {3} qty available or split the row into multiple rows, to deliver/issue from multiple batches"
+                        ).format(d.idx, d.batch_no, batch_qty, qty)
+                    )
+
+def set_batch_nos(doc, warehouse_field, throw=False, child_table="items"):
+    """Automatically select `batch_no` for outgoing items in item table"""
+    for d in doc.get(child_table):
+        qty = d.get("stock_qty") or d.get("transfer_qty") or d.get("qty") or 0
+        warehouse = d.get(warehouse_field, None)
+        if warehouse and qty > 0 and frappe.db.get_value("Item", d.item_code, "has_batch_no"):
+            if not d.batch_no:
+                d.batch_no = get_batch_no(d.item_code, warehouse, qty, throw, d.serial_no)
             else:
                 batch_qty = get_batch_qty(batch_no=d.batch_no, warehouse=warehouse)
                 if flt(batch_qty, d.precision("qty")) < flt(qty, d.precision("qty")):
@@ -1390,8 +1406,8 @@ def build_item_cache(item_code):
 
     disabled_items = set([i.name for i in frappe.db.get_all("Item", {"disabled": 1})])
 
-    attribute_value_item_map = frappe._dict({})
-    item_attribute_value_map = frappe._dict({})
+    attribute_value_item_map = __dict({})
+    item_attribute_value_map = __dict({})
 
     item_variants_data = [r for r in item_variants_data if r[0] not in disabled_items]
     for row in item_variants_data:
@@ -1530,7 +1546,7 @@ def get_existing_payment_request(doc, pay):
 def make_payment_request(**args):
     """Make payment request"""
 
-    args = frappe._dict(args)
+    args = __dict(args)
 
     ref_doc = frappe.get_doc(args.dt, args.dn)
     gateway_account = get_payment_gateway_account(args.get("payment_gateway_account"))
