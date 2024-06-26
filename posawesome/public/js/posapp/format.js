@@ -33,14 +33,14 @@ export default {
             let value = 0;
             try {
                 // make sure it is a number and positive
-                let _value = parseFloat($event);
+                let _value = parseFloat($event.target.value);
                 if (!isNaN(_value)) {
                     value = _value;
                 }
                 if (no_negative && value < 0) {
                     value = value * -1;
                 }
-                value = this.formtCurrency($event, precision);
+                value = this.formtCurrency($event.target.value, precision);
             } catch (e) {
                 console.error(e);
                 value = 0;
@@ -60,13 +60,13 @@ export default {
             let value = 0;
             try {
                 // make sure it is a number and positive
-                value = parseFloat($event);
+                value = parseFloat($event.target.value);
                 if (isNaN(value)) {
                     value = 0;
                 } else if (no_negative && value < 0) {
                     value = value * -1;
                 }
-                value = this.formtFloat($event, precision);
+                value = this.formtFloat($event.target.value, precision);
             } catch (e) {
                 console.error(e);
                 value = 0;

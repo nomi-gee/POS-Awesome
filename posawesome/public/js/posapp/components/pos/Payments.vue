@@ -15,12 +15,12 @@
         <v-row v-if="invoice_doc" class="px-1 py-0">
           <v-col cols="7">
             <v-text-field
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Paid Amount')"
               background-color="white"
               hide-details
-              :value="formtCurrency(total_payments)"
+              :model-value="formtCurrency(total_payments)"
               readonly
               :prefix="currencySymbol(invoice_doc.currency)"
               dense
@@ -28,12 +28,12 @@
           </v-col>
           <v-col cols="5">
             <v-text-field
-              outlined
+              variant="outlined"
               color="primary"
               :label="__(diff_lable)"
               background-color="white"
               hide-details
-              :value="formtCurrency(diff_payment)"
+              :model-value="formtCurrency(diff_payment)"
               readonly
               :prefix="currencySymbol(invoice_doc.currency)"
               dense
@@ -42,7 +42,7 @@
 
           <v-col cols="7" v-if="diff_payment < 0 && !invoice_doc.is_return">
             <v-text-field
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Paid Change')"
               background-color="white"
@@ -58,12 +58,12 @@
 
           <v-col cols="5" v-if="diff_payment < 0 && !invoice_doc.is_return">
             <v-text-field
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Credit Change')"
               background-color="white"
               hide-details
-              :value="formtCurrency(credit_change)"
+              :model-value="formtCurrency(credit_change)"
               readonly
               :prefix="currencySymbol(invoice_doc.currency)"
               dense
@@ -81,12 +81,12 @@
             <v-col cols="6" v-if="!is_mpesa_c2b_payment(payment)">
               <v-text-field
                 dense
-                outlined
+                variant="outlined"
                 color="primary"
                 :label="__(payment.mode_of_payment)"
                 background-color="white"
                 hide-details
-                :value="formtCurrency(payment.amount)"
+                :model-value="formtCurrency(payment.amount)"
                 @change="
                   setFormatedCurrency(payment, 'amount', null, true, $event)
                 "
@@ -164,7 +164,7 @@
           <v-col cols="7">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Redeem Loyalty Points')"
               background-color="white"
@@ -182,7 +182,7 @@
               :label="__('You can redeem upto')"
               background-color="white"
               hide-details
-              :value="formtFloat(available_pioints_amount)"
+              :model-value="formtFloat(available_pioints_amount)"
               :prefix="currencySymbol(invoice_doc.currency)"
               disabled
             ></v-text-field>
@@ -201,7 +201,7 @@
           <v-col cols="7">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               disabled
               color="primary"
               :label="__('Redeemed Customer Credit')"
@@ -215,12 +215,12 @@
           <v-col cols="5">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('You can redeem credit upto')"
               background-color="white"
               hide-details
-              :value="formtCurrency(available_customer_credit)"
+              :model-value="formtCurrency(available_customer_credit)"
               :prefix="currencySymbol(invoice_doc.currency)"
               disabled
             ></v-text-field>
@@ -232,12 +232,12 @@
           <v-col cols="6">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Net Total')"
               background-color="white"
               hide-details
-              :value="formtCurrency(invoice_doc.net_total)"
+              :model-value="formtCurrency(invoice_doc.net_total)"
               disabled
               :prefix="currencySymbol(invoice_doc.currency)"
             ></v-text-field>
@@ -245,12 +245,12 @@
           <v-col cols="6">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Tax and Charges')"
               background-color="white"
               hide-details
-              :value="formtCurrency(invoice_doc.total_taxes_and_charges)"
+              :model-value="formtCurrency(invoice_doc.total_taxes_and_charges)"
               disabled
               :prefix="currencySymbol(invoice_doc.currency)"
             ></v-text-field>
@@ -258,12 +258,12 @@
           <v-col cols="6">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Total Amount')"
               background-color="white"
               hide-details
-              :value="formtCurrency(invoice_doc.total)"
+              :model-value="formtCurrency(invoice_doc.total)"
               disabled
               :prefix="currencySymbol(invoice_doc.currency)"
             ></v-text-field>
@@ -271,12 +271,12 @@
           <v-col cols="6">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Discount Amount')"
               background-color="white"
               hide-details
-              :value="formtCurrency(invoice_doc.discount_amount)"
+              :model-value="formtCurrency(invoice_doc.discount_amount)"
               disabled
               :prefix="currencySymbol(invoice_doc.currency)"
             ></v-text-field>
@@ -284,12 +284,12 @@
           <v-col cols="6">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Grand Total')"
               background-color="white"
               hide-details
-              :value="formtCurrency(invoice_doc.grand_total)"
+              :model-value="formtCurrency(invoice_doc.grand_total)"
               disabled
               :prefix="currencySymbol(invoice_doc.currency)"
             ></v-text-field>
@@ -297,12 +297,12 @@
           <v-col v-if="invoice_doc.rounded_total" cols="6">
             <v-text-field
               dense
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Rounded Total')"
               background-color="white"
               hide-details
-              :value="formtCurrency(invoice_doc.rounded_total)"
+              :model-value="formtCurrency(invoice_doc.rounded_total)"
               disabled
               :prefix="currencySymbol(invoice_doc.currency)"
             ></v-text-field>
@@ -323,7 +323,7 @@
                   v-model="invoice_doc.posa_delivery_date"
                   :label="__('Delivery Date')"
                   readonly
-                  outlined
+                  variant="outlined"
                   dense
                   background-color="white"
                   clearable
@@ -349,7 +349,7 @@
               dense
               clearable
               auto-select-first
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Address')"
               v-model="invoice_doc.shipping_address_name"
@@ -401,7 +401,7 @@
           <v-col cols="12" v-if="pos_profile.posa_display_additional_notes">
             <v-textarea
               class="pa-0"
-              outlined
+              variant="outlined"
               dense
               background-color="white"
               clearable
@@ -410,7 +410,7 @@
               rows="2"
               :label="__('Additional Notes')"
               v-model="invoice_doc.posa_notes"
-              :value="invoice_doc.posa_notes"
+              :model-value="invoice_doc.posa_notes"
             ></v-textarea>
           </v-col>
         </v-row>
@@ -422,7 +422,7 @@
               <v-text-field
                 v-model="invoice_doc.po_no"
                 :label="__('Purchase Order')"
-                outlined
+                variant="outlined"
                 dense
                 background-color="white"
                 clearable
@@ -442,7 +442,7 @@
                     v-model="invoice_doc.po_date"
                     :label="__('Purchase Order Date')"
                     readonly
-                    outlined
+                    variant="outlined"
                     dense
                     hide-details
                     v-bind="attrs"
@@ -513,7 +513,7 @@
                   v-model="invoice_doc.due_date"
                   :label="__('Due Date')"
                   readonly
-                  outlined
+                  variant="outlined"
                   dense
                   hide-details
                   v-bind="attrs"
@@ -541,7 +541,7 @@
               flat
               :label="__('Use Customer Credit')"
               class="my-0 py-0"
-              @change="get_available_credit($event)"
+              @change="get_available_credit($event.target.value)"
             ></v-switch>
           </v-col>
         </v-row>
@@ -560,12 +560,12 @@
             <v-col cols="4">
               <v-text-field
                 dense
-                outlined
+                variant="outlined"
                 color="primary"
                 :label="__('Available Credit')"
                 background-color="white"
                 hide-details
-                :value="formtCurrency(row.total_credit)"
+                :model-value="formtCurrency(row.total_credit)"
                 disabled
                 :prefix="currencySymbol(invoice_doc.currency)"
               ></v-text-field>
@@ -573,7 +573,7 @@
             <v-col cols="4">
               <v-text-field
                 dense
-                outlined
+                variant="outlined"
                 color="primary"
                 :label="__('Redeem Credit')"
                 background-color="white"
@@ -592,7 +592,7 @@
               dense
               clearable
               auto-select-first
-              outlined
+              variant="outlined"
               color="primary"
               :label="__('Sales Person')"
               v-model="sales_person"
@@ -674,7 +674,7 @@
             <v-container>
               <v-text-field
                 dense
-                outlined
+                variant="outlined"
                 color="primary"
                 :label="__('Mobile Number')"
                 background-color="white"

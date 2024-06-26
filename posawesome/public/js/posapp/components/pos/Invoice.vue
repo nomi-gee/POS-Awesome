@@ -74,7 +74,7 @@
             hide-details
             :filter="deliveryChargesFilter"
             :disabled="readonly"
-            @change="update_delivery_charges()"
+            @change="update_delivery_charges"
           >
             <template v-slot:item="{ props, item }">
                 <v-list-item
@@ -157,10 +157,10 @@
           <v-data-table
             :headers="items_headers"
             :items="items"
-            :single-expand="singleExpand"
-            v-model:expanded="expanded"
+            v-model:expanded.sync="expanded"
             show-expand
             item-key="posa_row_id"
+            item-value="posa_row_id"
             class="elevation-1"
             :items-per-page="itemsPerPage"
             hide-default-footer
@@ -188,7 +188,7 @@
               ></v-checkbox>
             </template>
 
-            <template v-slot:expanded-item="{ columns, item }">
+            <template v-slot:expanded-row="{ columns, item }">
               <td :colspan="columns.length" class="ma-0 pa-0">
                 <v-row class="ma-0 pa-0">
                   <v-col cols="1">
@@ -248,7 +248,7 @@
                       @change="
                         [
                           setFormatedFloat(item, 'qty', null, false, $event),
-                          calc_stock_qty(item, $event),
+                          calc_stock_qty(item, parseFloat($event.target.value)),
                         ]
                       "
                       :rules="[isNumber]"
@@ -266,7 +266,7 @@
                       item-text="uom"
                       item-value="uom"
                       hide-details
-                      @change="calc_uom(item, $event)"
+                      @change="calc_uom(item, $event.target.value)"
                       :disabled="
                         !!invoice_doc.is_return ||
                         !!item.posa_is_offer ||
@@ -294,7 +294,7 @@
                             false,
                             $event
                           ),
-                          calc_prices(item, $event),
+                          calc_prices(item, $event.target.value),
                         ]
                       "
                       :rules="[isNumber]"
@@ -328,7 +328,7 @@
                             true,
                             $event
                           ),
-                          calc_prices(item, $event),
+                          calc_prices(item, $event.target.value),
                         ]
                       "
                       :rules="[isNumber]"
@@ -365,7 +365,7 @@
                             $event
                           ),
                           ,
-                          calc_prices(item, $event),
+                          calc_prices(item, $event.target.value),
                         ]
                       "
                       :prefix="currencySymbol(pos_profile.currency)"
@@ -528,7 +528,7 @@
                       dense
                       color="primary"
                       :label="__('Batch No')"
-                      @change="set_batch_qty(item, $event)"
+                      @change="set_batch_qty(item, $event.target.value)"
                     >
                       <template v-slot:item="{ props, item }">
                           <v-list-item
@@ -693,7 +693,7 @@
                       false,
                       $event
                     ),
-                    update_discount_umount(),
+                    update_discount_umount($event),
                   ]
                 "
                 :rules="[isNumber]"
@@ -802,9 +802,10 @@
                 class="pa-0"
                 color="success"
                 @click="show_payment"
-                dark
-                >{{ __("PAY") }}</v-btn
+                variant="flat"
               >
+                {{ __("PAY") }}
+              </v-btn>
             </v-col>
             <v-col
               v-if="pos_profile.posa_allow_print_draft_invoices"
@@ -1452,6 +1453,7 @@ export default {
 
     async show_payment() {
       if (!this.customer) {
+        console.log(1);
         evntBus.emit("show_mesage", {
           text: __(`There is no Customer !`),
           color: "error",
@@ -1877,7 +1879,8 @@ export default {
       }
       evntBus.emit("update_customer_price_list", price_list);
     },
-    update_discount_umount() {
+    update_discount_umount(event) {
+      this.additional_discount_percentage = event.target.value;
       const value = flt(this.additional_discount_percentage);
       if (value >= -100 && value <= 100) {
         this.discount_amount = (this.Total * value) / 100;
@@ -2877,7 +2880,8 @@ export default {
       const searchText = queryText.toLowerCase();
       return textOne.indexOf(searchText) > -1;
     },
-    update_delivery_charges() {
+    update_delivery_charges($event) {
+      this.selcted_delivery_charges = $event.target.value;
       if (this.selcted_delivery_charges) {
         this.delivery_charges_rate = this.selcted_delivery_charges.rate;
       } else {
@@ -2990,10 +2994,16 @@ export default {
       evntBus.emit("set_customer_info_to_edit", this.customer_info);
     },
     expanded(data_value) {
-      console.log(data_value);
-      // this.update_items_details(data_value);
+      var me = this;
+      if(data_value.length == 2){
+        data_value.shift();
+      }
       if (data_value.length > 0) {
-        this.update_item_detail(data_value[0]);
+        $.each(this.items || [], function(i,v){
+          if(v.posa_row_id == data_value[0]){
+            me.update_item_detail(v);
+          }
+        });
       }
     },
     discount_percentage_offer_name() {
