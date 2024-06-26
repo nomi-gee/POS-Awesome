@@ -1,19 +1,14 @@
 <template>
   <div>
     <v-autocomplete
-      dense
-      clearable
-      auto-select-first
-      outlined
+      density="compact"
+      variant="outlined"
       color="primary"
       :label="__('Customer')"
       v-model="customer"
       :items="customers"
-      item-text="customer_name"
+      item-title="customer_name"
       item-value="name"
-      background-color="white"
-      :no-data-text="__('Customer not found')"
-      hide-details
       :filter="customFilter"
       :disabled="readonly"
       append-icon="mdi-plus"
@@ -21,35 +16,35 @@
       prepend-inner-icon="mdi-account-edit"
       @click:prepend-inner="edit_customer"
     >
-      <template v-slot:item="data">
-        <template>
-          <v-list-item-content>
+      <template v-slot:item="{ props, item }">
+          <v-list-item
+            v-bind="props"
+            >
             <v-list-item-title
               class="primary--text subtitle-1"
-              v-html="data.item.customer_name"
+              v-html="item.customer_name"
             ></v-list-item-title>
             <v-list-item-subtitle
-              v-if="data.item.customer_name != data.item.name"
-              v-html="`ID: ${data.item.name}`"
+              v-if="item.customer_name != item.name"
+              v-html="`ID: ${item.name}`"
             ></v-list-item-subtitle>
             <v-list-item-subtitle
-              v-if="data.item.tax_id"
-              v-html="`TAX ID: ${data.item.tax_id}`"
+              v-if="item.tax_id"
+              v-html="`TAX ID: ${item.tax_id}`"
             ></v-list-item-subtitle>
             <v-list-item-subtitle
-              v-if="data.item.email_id"
-              v-html="`Email: ${data.item.email_id}`"
+              v-if="item.email_id"
+              v-html="`Email: ${item.email_id}`"
             ></v-list-item-subtitle>
             <v-list-item-subtitle
-              v-if="data.item.mobile_no"
-              v-html="`Mobile No: ${data.item.mobile_no}`"
+              v-if="item.mobile_no"
+              v-html="`Mobile No: ${item.mobile_no}`"
             ></v-list-item-subtitle>
             <v-list-item-subtitle
-              v-if="data.item.primary_address"
-              v-html="`Primary Address: ${data.item.primary_address}`"
+              v-if="item.primary_address"
+              v-html="`Primary Address: ${item.primary_address}`"
             ></v-list-item-subtitle>
-          </v-list-item-content>
-        </template>
+          </v-list-item>
       </template>
     </v-autocomplete>
     <div class="mb-8">

@@ -97,7 +97,6 @@
           </div>
           <div fluid class="items" v-if="items_view == 'list'">
             <div class="my-0 py-0 overflow-y-auto" style="max-height: 65vh">
-              <template>
                 <v-data-table
                   :headers="getItmesHeaders()"
                   :items="filtred_items"
@@ -105,7 +104,7 @@
                   class="elevation-1"
                   :items-per-page="itemsPerPage"
                   hide-default-footer
-                  @click:row="add_item"
+                  @click:row="add_item_table"
                 >
                   <template v-slot:item.rate="{ item }">
                     <span class="primary--text"
@@ -119,7 +118,6 @@
                     }}</span>
                   </template>
                 </v-data-table>
-              </template>
             </div>
           </div>
         </v-col>
@@ -306,26 +304,38 @@ export default {
     getItmesHeaders() {
       const items_headers = [
         {
-          text: __("Name"),
+          title: __("Name"),
           align: "start",
           sortable: true,
-          value: "item_name",
+          key: "item_name",
         },
         {
-          text: __("Code"),
+          title: __("Code"),
           align: "start",
           sortable: true,
-          value: "item_code",
+          key: "item_code",
         },
-        { text: __("Rate"), value: "rate", align: "start" },
-        { text: __("Available QTY"), value: "actual_qty", align: "start" },
-        { text: __("UOM"), value: "stock_uom", align: "start" },
+        { title: __("Rate"), key: "rate", align: "start" },
+        { title: __("Available QTY"), key: "actual_qty", align: "start" },
+        { title: __("UOM"), key: "stock_uom", align: "start" },
       ];
       if (!this.pos_profile.posa_display_item_code) {
         items_headers.splice(1, 1);
       }
 
       return items_headers;
+    },
+    add_item_table(event, item){
+      item = { ...item.item };
+      if (item.has_variants) {
+        evntBus.emit("open_variants_model", item, this.items);
+      } else {
+        if (!item.qty || item.qty === 1) {
+          item.qty = Math.abs(this.qty);
+        }
+        evntBus.emit("add_item", item);
+        this.qty = 1;
+      }
     },
     add_item(item) {
       item = { ...item };

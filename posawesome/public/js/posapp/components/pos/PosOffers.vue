@@ -21,7 +21,7 @@
             hide-default-footer
           >
             <template v-slot:item.offer_applied="{ item }">
-              <v-simple-checkbox
+              <v-checkbox
                 @click="forceUpdateItem"
                 v-model="item.offer_applied"
                 :disabled="
@@ -32,7 +32,7 @@
                     discount_percentage_offer_name &&
                     discount_percentage_offer_name != item.name)
                 "
-              ></v-simple-checkbox>
+              ></v-checkbox>
             </template>
             <template v-slot:expanded-item="{ headers, item }">
               <td :colspan="headers.length">
@@ -104,10 +104,10 @@ export default {
     expanded: [],
     singleExpand: true,
     items_headers: [
-      { text: __('Name'), value: 'name', align: 'start' },
-      { text: __('Apply On'), value: 'apply_on', align: 'start' },
-      { text: __('Offer'), value: 'offer', align: 'start' },
-      { text: __('Applied'), value: 'offer_applied', align: 'start' },
+      { title: __('Name'), key: 'name', align: 'start' },
+      { title: __('Apply On'), key: 'apply_on', align: 'start' },
+      { title: __('Offer'), key: 'offer', align: 'start' },
+      { title: __('Applied'), key: 'offer_applied', align: 'start' },
     ],
   }),
 

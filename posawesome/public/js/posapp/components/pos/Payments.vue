@@ -354,7 +354,7 @@
               :label="__('Address')"
               v-model="invoice_doc.shipping_address_name"
               :items="addresses"
-              item-text="address_title"
+              item-title="address_title"
               item-value="name"
               background-color="white"
               no-data-text="Address not found"
@@ -363,38 +363,38 @@
               append-icon="mdi-plus"
               @click:append="new_address"
             >
-              <template v-slot:item="data">
-                <template>
-                  <v-list-item-content>
+              <template v-slot:item="{ props, item }">
+                  <v-list-item
+                    v-bind="props"
+                    >
                     <v-list-item-title
                       class="primary--text subtitle-1"
-                      v-html="data.item.address_title"
+                      v-html="item.address_title"
                     ></v-list-item-title>
                     <v-list-item-title
-                      v-html="data.item.address_line1"
+                      v-html="item.address_line1"
                     ></v-list-item-title>
                     <v-list-item-subtitle
-                      v-if="data.item.custoaddress_line2mer_name"
-                      v-html="data.item.address_line2"
+                      v-if="item.custoaddress_line2mer_name"
+                      v-html="item.address_line2"
                     ></v-list-item-subtitle>
                     <v-list-item-subtitle
-                      v-if="data.item.city"
-                      v-html="data.item.city"
+                      v-if="item.city"
+                      v-html="item.city"
                     ></v-list-item-subtitle>
                     <v-list-item-subtitle
-                      v-if="data.item.state"
-                      v-html="data.item.state"
+                      v-if="item.state"
+                      v-html="item.state"
                     ></v-list-item-subtitle>
                     <v-list-item-subtitle
-                      v-if="data.item.country"
-                      v-html="data.item.mobile_no"
+                      v-if="item.country"
+                      v-html="item.mobile_no"
                     ></v-list-item-subtitle>
                     <v-list-item-subtitle
-                      v-if="data.item.address_type"
-                      v-html="data.item.address_type"
+                      v-if="item.address_type"
+                      v-html="item.address_type"
                     ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </template>
+                  </v-list-item>
               </template>
             </v-autocomplete>
           </v-col>
@@ -597,7 +597,7 @@
               :label="__('Sales Person')"
               v-model="sales_person"
               :items="sales_persons"
-              item-text="sales_person_name"
+              item-title="sales_person_name"
               item-value="name"
               background-color="white"
               :no-data-text="__('Sales Person not found')"
@@ -605,19 +605,19 @@
               :filter="salesPersonFilter"
               :disabled="readonly"
             >
-              <template v-slot:item="data">
-                <template>
-                  <v-list-item-content>
+              <template v-slot:item="{ props, item }">
+                  <v-list-item
+                    v-bind="props"
+                  >
                     <v-list-item-title
                       class="primary--text subtitle-1"
-                      v-html="data.item.sales_person_name"
+                      v-html="item.sales_person_name"
                     ></v-list-item-title>
                     <v-list-item-subtitle
-                      v-if="data.item.sales_person_name != data.item.name"
-                      v-html="`ID: ${data.item.name}`"
+                      v-if="item.sales_person_name != item.name"
+                      v-html="`ID: ${item.name}`"
                     ></v-list-item-subtitle>
-                  </v-list-item-content>
-                </template>
+                  </v-list-item>
               </template>
             </v-autocomplete>
           </v-col>
@@ -728,6 +728,7 @@ export default {
     pos_settings: "",
     customer_info: "",
     mpesa_modes: [],
+    readonly: true,
   }),
 
   methods: {

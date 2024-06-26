@@ -67,7 +67,7 @@
             :label="__('Delivery Charges')"
             v-model="selcted_delivery_charges"
             :items="delivery_charges"
-            item-text="name"
+            item-title="name"
             return-object
             background-color="white"
             :no-data-text="__('Charges not found')"
@@ -76,18 +76,18 @@
             :disabled="readonly"
             @change="update_delivery_charges()"
           >
-            <template v-slot:item="data">
-              <template>
-                <v-list-item-content>
+            <template v-slot:item="{ props, item }">
+                <v-list-item
+                  v-bind="props"
+                >
                   <v-list-item-title
                     class="primary--text subtitle-1"
-                    v-html="data.item.name"
+                    v-html="item.name"
                   ></v-list-item-title>
                   <v-list-item-subtitle
-                    v-html="`Rate: ${data.item.rate}`"
+                    v-html="`Rate: ${item.rate}`"
                   ></v-list-item-subtitle>
-                </v-list-item-content>
-              </template>
+                </v-list-item>
             </template>
           </v-autocomplete>
         </v-col>
@@ -154,12 +154,11 @@
       </v-row>
 
       <div class="my-0 py-0 overflow-y-auto" style="max-height: 60vh">
-        <template @mouseover="style = 'cursor: pointer'">
           <v-data-table
             :headers="items_headers"
             :items="items"
             :single-expand="singleExpand"
-            :expanded.sync="expanded"
+            v-model:expanded="expanded"
             show-expand
             item-key="posa_row_id"
             class="elevation-1"
@@ -183,14 +182,14 @@
               }}</template
             >
             <template v-slot:item.posa_is_offer="{ item }">
-              <v-simple-checkbox
-                :value="!!item.posa_is_offer || !!item.posa_is_replace"
-                disabled
-              ></v-simple-checkbox>
+              <v-checkbox
+                :model-value="!!item.posa_is_offer || !!item.posa_is_replace"
+                :disabled="true"
+              ></v-checkbox>
             </template>
 
-            <template v-slot:expanded-item="{ headers, item }">
-              <td :colspan="headers.length" class="ma-0 pa-0">
+            <template v-slot:expanded-item="{ columns, item }">
+              <td :colspan="columns.length" class="ma-0 pa-0">
                 <v-row class="ma-0 pa-0">
                   <v-col cols="1">
                     <v-btn
@@ -228,7 +227,7 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Item Code')"
                       background-color="white"
@@ -240,12 +239,12 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('QTY')"
                       background-color="white"
                       hide-details
-                      :value="formtFloat(item.qty)"
+                      :model-value="formtFloat(item.qty)"
                       @change="
                         [
                           setFormatedFloat(item, 'qty', null, false, $event),
@@ -279,13 +278,13 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Rate')"
                       background-color="white"
                       hide-details
                       :prefix="currencySymbol(pos_profile.currency)"
-                      :value="formtCurrency(item.rate)"
+                      :model-value="formtCurrency(item.rate)"
                       @change="
                         [
                           setFormatedCurrency(
@@ -314,12 +313,12 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Discount Percentage')"
                       background-color="white"
                       hide-details
-                      :value="formtFloat(item.discount_percentage)"
+                      :model-value="formtFloat(item.discount_percentage)"
                       @change="
                         [
                           setFormatedCurrency(
@@ -349,12 +348,12 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Discount Amount')"
                       background-color="white"
                       hide-details
-                      :value="formtCurrency(item.discount_amount)"
+                      :model-value="formtCurrency(item.discount_amount)"
                       :rules="[isNumber]"
                       @change="
                         [
@@ -385,12 +384,12 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Price list Rate')"
                       background-color="white"
                       hide-details
-                      :value="formtCurrency(item.price_list_rate)"
+                      :model-value="formtCurrency(item.price_list_rate)"
                       disabled
                       :prefix="currencySymbol(pos_profile.currency)"
                     ></v-text-field>
@@ -398,19 +397,19 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Available QTY')"
                       background-color="white"
                       hide-details
-                      :value="formtFloat(item.actual_qty)"
+                      :model-value="formtFloat(item.actual_qty)"
                       disabled
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Group')"
                       background-color="white"
@@ -422,19 +421,19 @@
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Stock QTY')"
                       background-color="white"
                       hide-details
-                      :value="formtFloat(item.stock_qty)"
+                      :model-value="formtFloat(item.stock_qty)"
                       disabled
                     ></v-text-field>
                   </v-col>
                   <v-col cols="4">
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Stock UOM')"
                       background-color="white"
@@ -459,7 +458,7 @@
                   >
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Serial No QTY')"
                       background-color="white"
@@ -476,8 +475,8 @@
                     <v-autocomplete
                       v-model="item.serial_no_selected"
                       :items="item.serial_no_data"
-                      item-text="serial_no"
-                      outlined
+                      item-title="serial_no"
+                      variant="outlined"
                       dense
                       chips
                       color="primary"
@@ -493,7 +492,7 @@
                   >
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Batch No. Available QTY')"
                       background-color="white"
@@ -508,7 +507,7 @@
                   >
                     <v-text-field
                       dense
-                      outlined
+                      variant="outlined"
                       color="primary"
                       :label="__('Batch No Expiry Date')"
                       background-color="white"
@@ -524,26 +523,26 @@
                     <v-autocomplete
                       v-model="item.batch_no"
                       :items="item.batch_no_data"
-                      item-text="batch_no"
-                      outlined
+                      item-title="batch_no"
+                      variant="outlined"
                       dense
                       color="primary"
                       :label="__('Batch No')"
                       @change="set_batch_qty(item, $event)"
                     >
-                      <template v-slot:item="data">
-                        <template>
-                          <v-list-item-content>
+                      <template v-slot:item="{ props, item }">
+                          <v-list-item
+                            v-bind="props"
+                          >
                             <v-list-item-title
-                              v-html="data.item.batch_no"
+                              v-html="item.batch_no"
                             ></v-list-item-title>
                             <v-list-item-subtitle
                               v-html="
-                                `Available QTY  '${data.item.batch_qty}' - Expiry Date ${data.item.expiry_date}`
+                                `Available QTY  '${item.batch_qty}' - Expiry Date ${item.expiry_date}`
                               "
                             ></v-list-item-subtitle>
-                          </v-list-item-content>
-                        </template>
+                          </v-list-item>
                       </template>
                     </v-autocomplete>
                   </v-col>
@@ -567,7 +566,7 @@
                           v-model="item.posa_delivery_date"
                           :label="__('Delivery Date')"
                           readonly
-                          outlined
+                          variant="outlined"
                           dense
                           clearable
                           color="primary"
@@ -614,7 +613,7 @@
                   >
                     <v-textarea
                       class="pa-0"
-                      outlined
+                      variant="outlined"
                       dense
                       clearable
                       color="primary"
@@ -622,14 +621,13 @@
                       rows="1"
                       :label="__('Additional Notes')"
                       v-model="item.posa_notes"
-                      :value="item.posa_notes"
+                      :model-value="item.posa_notes"
                     ></v-textarea>
                   </v-col>
                 </v-row>
               </td>
             </template>
           </v-data-table>
-        </template>
       </div>
     </v-card>
     <v-card class="cards mb-0 mt-3 py-0 grey lighten-5">
@@ -638,9 +636,9 @@
           <v-row no-gutters class="pa-1 pt-9 pr-1">
             <v-col cols="6" class="pa-1">
               <v-text-field
-                :value="formtFloat(total_qty)"
+                :model-value="formtFloat(total_qty)"
                 :label="__('Total Qty')"
-                outlined
+                variant="outlined"
                 dense
                 readonly
                 hide-details
@@ -653,7 +651,7 @@
               class="pa-1"
             >
               <v-text-field
-                :value="formtCurrency(discount_amount)"
+                :model-value="formtCurrency(discount_amount)"
                 @change="
                   setFormatedCurrency(
                     discount_amount,
@@ -666,7 +664,7 @@
                 :rules="[isNumber]"
                 :label="__('Additional Discount')"
                 ref="discount"
-                outlined
+                variant="outlined"
                 dense
                 hide-details
                 color="warning"
@@ -685,7 +683,7 @@
               class="pa-1"
             >
               <v-text-field
-                :value="formtFloat(additional_discount_percentage)"
+                :model-value="formtFloat(additional_discount_percentage)"
                 @change="
                   [
                     setFormatedFloat(
@@ -702,7 +700,7 @@
                 :label="__('Additional Discount %')"
                 suffix="%"
                 ref="percentage_discount"
-                outlined
+                variant="outlined"
                 dense
                 color="warning"
                 hide-details
@@ -716,10 +714,10 @@
             </v-col>
             <v-col cols="6" class="pa-1 mt-2">
               <v-text-field
-                :value="formtCurrency(total_items_discount_amount)"
+                :model-value="formtCurrency(total_items_discount_amount)"
                 :prefix="currencySymbol(pos_profile.currency)"
                 :label="__('Items Discounts')"
-                outlined
+                variant="outlined"
                 dense
                 color="warning"
                 readonly
@@ -729,10 +727,10 @@
 
             <v-col cols="6" class="pa-1 mt-2">
               <v-text-field
-                :value="formtCurrency(subtotal)"
+                :model-value="formtCurrency(subtotal)"
                 :prefix="currencySymbol(pos_profile.currency)"
                 :label="__('Total')"
-                outlined
+                variant="outlined"
                 dense
                 readonly
                 hide-details
@@ -870,16 +868,16 @@ export default {
       posting_date: frappe.datetime.nowdate(),
       items_headers: [
         {
-          text: __("Name"),
+          title: __("Name"),
           align: "start",
           sortable: true,
-          value: "item_name",
+          key: "item_name",
         },
-        { text: __("QTY"), value: "qty", align: "center" },
-        { text: __("UOM"), value: "uom", align: "center" },
-        { text: __("Rate"), value: "rate", align: "center" },
-        { text: __("Amount"), value: "amount", align: "center" },
-        { text: __("is Offer"), value: "posa_is_offer", align: "center" },
+        { title: __("QTY"), key: "qty", align: "center" },
+        { title: __("UOM"), key: "uom", align: "center" },
+        { title: __("Rate"), key: "rate", align: "center" },
+        { title: __("Amount"), key: "amount", align: "center" },
+        { title: __("is Offer"), key: "posa_is_offer", align: "center" },
       ],
     };
   },
@@ -957,6 +955,7 @@ export default {
     },
 
     add_item(item) {
+      console.log(item);
       if (!item.uom) {
         item.uom = item.stock_uom;
       }
@@ -2991,6 +2990,7 @@ export default {
       evntBus.emit("set_customer_info_to_edit", this.customer_info);
     },
     expanded(data_value) {
+      console.log(data_value);
       // this.update_items_details(data_value);
       if (data_value.length > 0) {
         this.update_item_detail(data_value[0]);

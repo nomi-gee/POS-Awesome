@@ -16,7 +16,7 @@
               <v-col cols="12">
                 <v-autocomplete
                   :items="companies"
-                  :label="__('Company')"
+                  :label="frappe._('Company')"
                   v-model="company"
                   required
                 ></v-autocomplete>
@@ -24,7 +24,7 @@
               <v-col cols="12">
                 <v-autocomplete
                   :items="pos_profiles"
-                  :label="__('POS Profile')"
+                  :label="frappe._('POS Profile')"
                   v-model="pos_profile"
                   required
                 ></v-autocomplete>
@@ -38,7 +38,18 @@
                     :items-per-page="itemsPerPage"
                     hide-default-footer
                   >
-                    
+                    <template v-slot:[`item.amount`]="{ item }">
+                      {{ currencySymbol(item.currency) }}
+                      <v-text-field
+                        v-model="item.amount"
+                        :rules="[max25chars]"
+                        :label="frappe._('Edit')"
+                        single-line
+                        counter
+                        type="number"
+                        @blur="item.editing = false"
+                      ></v-text-field>
+                    </template>
                   </v-data-table>
               </v-col>
             </v-row>
@@ -61,129 +72,139 @@
 </template>
 
 <script>
+import { ref, onMounted, watch } from 'vue';
 import { evntBus } from '../../bus';
 import format from '../../format';
+
 export default {
   mixins: [format],
   props: ['dialog'],
-  data() {
-    return {
-      isOpen: this.dialog ? this.dialog : false,
-      dialog_data: {},
-      is_loading: false,
-      companies: [],
-      company: '',
-      pos_profiles_data: [],
-      pos_profiles: [],
-      pos_profile: '',
-      payments_method_data: [],
-      payments_methods: [],
-      payments_methods_headers: [
-        {
-          title: __('Mode of Payment'),
-          align: 'start',
-          sortable: false,
-          key: 'mode_of_payment',
-        },
-        {
-          title: __('Opening Amount'),
-          key: 'amount',
-          align: 'start',
-          sortable: false,
-        },
-        {
-          title: __('Curreny'),
-          key: 'currency',
-          align: 'start',
-          sortable: false,
-        },
-      ],
-      itemsPerPage: 100,
-      max25chars: (v) => v.length <= 12 || 'Input too long!', // TODO : should validate as number
-      pagination: {},
-      snack: false, // TODO : need to remove
-      snackColor: '', // TODO : need to remove
-      snackText: '', // TODO : need to remove
-    };
-  },
-  watch: {
-    company(val) {
-      this.pos_profiles = [];
-      this.pos_profiles_data.forEach((element) => {
-        if (element.company === val) {
-          this.pos_profiles.push(element.name);
-        }
-        if (this.pos_profiles.length) {
-          this.pos_profile = this.pos_profiles[0];
-        } else {
-          this.pos_profile = '';
-        }
-      });
-    },
-    pos_profile(val) {
-      this.payments_methods = [];
-      this.payments_method_data.forEach((element) => {
-        if (element.parent === val) {
-          this.payments_methods.push({
-            mode_of_payment: element.mode_of_payment,
-            amount: 0,
-            currency: element.currency,
-          });
-        }
-      });
-    },
-  },
-  methods: {
-    close_opening_dialog() {
+  setup(props) {
+    const isOpen = ref(props.dialog ? props.dialog : false);
+    const dialog_data = ref({});
+    const is_loading = ref(false);
+    const companies = ref([]);
+    const company = ref('');
+    const pos_profiles_data = ref([]);
+    const pos_profiles = ref([]);
+    const pos_profile = ref('');
+    const payments_method_data = ref([]);
+    const payments_methods = ref([]);
+    const payments_methods_headers = ref([
+      {
+        title: __('Mode of Payment'),
+        align: 'start',
+        sortable: false,
+        key: 'mode_of_payment',
+      },
+      {
+        title: __('Opening Amount'),
+        key: 'amount',
+        align: 'center',
+        sortable: false,
+      },
+    ]);
+    const itemsPerPage = ref(100);
+    const max25chars = (v) => v.length <= 12 || 'Input too long!'; // TODO : should validate as number
+
+    const close_opening_dialog = () => {
       evntBus.emit('close_opening_dialog');
-    },
-    get_opening_dialog_data() {
-      const vm = this;
+    };
+
+    const get_opening_dialog_data = () => {
       frappe.call({
         method: 'posawesome.posawesome.api.posapp.get_opening_dialog_data',
         args: {},
         callback: function (r) {
           if (r.message) {
             r.message.companies.forEach((element) => {
-              vm.companies.push(element.name);
+              companies.value.push(element.name);
             });
-            vm.company = vm.companies[0];
-            vm.pos_profiles_data = r.message.pos_profiles_data;
-            vm.payments_method_data = r.message.payments_method;
+            company.value = companies.value[0];
+            pos_profiles_data.value = r.message.pos_profiles_data;
+            payments_method_data.value = r.message.payments_method;
           }
         },
       });
-    },
-    submit_dialog() {
-      if (!this.payments_methods.length || !this.company || !this.pos_profile) {
+    };
+
+    const submit_dialog = () => {
+      if (!payments_methods.value.length || !company.value || !pos_profile.value) {
         return;
       }
-      this.is_loading = true;
-      const vm = this;
-      return frappe
+      is_loading.value = true;
+      frappe
         .call('posawesome.posawesome.api.posapp.create_opening_voucher', {
-          pos_profile: this.pos_profile,
-          company: this.company,
-          balance_details: this.payments_methods,
+          pos_profile: pos_profile.value,
+          company: company.value,
+          balance_details: payments_methods.value,
         })
         .then((r) => {
           if (r.message) {
             evntBus.emit('register_pos_data', r.message);
             evntBus.emit('set_company', r.message.company);
-            vm.close_opening_dialog();
-            is_loading = false;
+            close_opening_dialog();
+            is_loading.value = false;
           }
         });
-    },
-    go_desk() {
+    };
+
+    const go_desk = () => {
       frappe.set_route('/');
       location.reload();
-    },
-  },
-  created: function () {
-    this.$nextTick(function () {
-      this.get_opening_dialog_data();
+    };
+
+    watch(company, (val) => {
+      pos_profiles.value = [];
+      pos_profiles_data.value.forEach((element) => {
+        if (element.company === val) {
+          pos_profiles.value.push(element.name);
+        }
+      });
+      pos_profile.value = pos_profiles.value.length ? pos_profiles.value[0] : '';
     });
+
+    watch(pos_profile, (val) => {
+      payments_methods.value = [];
+      payments_method_data.value.forEach((element) => {
+        if (element.parent === val) {
+          payments_methods.value.push({
+            mode_of_payment: element.mode_of_payment,
+            amount: 0,
+            currency: element.currency,
+          });
+        }
+      });
+    });
+
+    onMounted(() => {
+      get_opening_dialog_data();
+    });
+
+    return {
+      isOpen,
+      dialog_data,
+      is_loading,
+      companies,
+      company,
+      pos_profiles_data,
+      pos_profiles,
+      pos_profile,
+      payments_method_data,
+      payments_methods,
+      payments_methods_headers,
+      itemsPerPage,
+      max25chars,
+      close_opening_dialog,
+      submit_dialog,
+      go_desk,
+    };
   },
 };
 </script>
+
+<style scoped>
+.margen-top {
+  margin-top: 0px;
+}
+</style>

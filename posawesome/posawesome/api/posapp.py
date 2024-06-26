@@ -927,8 +927,11 @@ def get_items_details(pos_profile, items_data):
             for item in items_data:
                 item_code = item.get("item_code")
                 item_stock_qty = get_stock_availability(item_code, warehouse)
-                has_batch_no, has_serial_no = frappe.get_value(
-                    "Item", item_code, ["has_batch_no", "has_serial_no"]
+                has_batch_no = frappe.get_value(
+                    "Item", item_code, "has_batch_no"
+                )
+                has_serial_no = frappe.get_value(
+                    "Item", item_code, "has_serial_no"
                 )
 
                 uoms = frappe.get_all(

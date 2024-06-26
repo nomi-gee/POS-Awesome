@@ -33,6 +33,7 @@ import {
   VCarouselItem,
   VCheckbox,
   VChip,
+  VChipGroup,
   VColorPicker,
   VCombobox,
   VCounter,
@@ -111,6 +112,7 @@ frappe.PosApp.posapp = class {
         const vuetify = createVuetify({
             components: {
                 // Layout
+                  VChipGroup,
                   VConfirmEdit,
                   VAutocomplete,
                   VApp,
