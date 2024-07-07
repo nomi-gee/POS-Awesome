@@ -1,14 +1,17 @@
 <template>
   <nav>
-    <v-app-bar height="40" elevation="2">
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="grey--text" />
+    <v-app-bar app height="40" class="elevation-2">
+      <v-app-bar-nav-icon
+        @click.stop="drawer = !drawer"
+        class="grey--text"
+      ></v-app-bar-nav-icon>
       <v-img
         src="/assets/posawesome/js/posapp/components/pos/pos.png"
         alt="POS Awesome"
         max-width="32"
         class="mr-2"
         color="primary"
-      />
+      ></v-img>
       <v-toolbar-title
         @click="go_desk"
         style="cursor: pointer"
@@ -23,190 +26,211 @@
         <span right>{{ pos_profile.name }}</span>
       </v-btn>
       <div class="text-center">
-        <v-menu offset-y>
-          <template v-slot:activator="{ props: menuProps }">
-            <v-btn color="primary" dark variant="text" v-bind="menuProps">Menu</v-btn>
+        <v-menu offset="y">
+          <template v-slot:activator="{ props }">
+            <v-btn color="primary" dark variant="text" v-bind="props">
+              Menu
+            </v-btn>
           </template>
           <v-card class="mx-auto" max-width="300" tile>
-            <v-list density="compact">
+            <v-list density="compact" v-model="menu_item">
               <v-list-item
-                v-for="(item, index) in menuItems"
-                :key="index"
-                @click="item.action"
+                @click="close_shift_dialog"
+                v-if="!pos_profile.posa_hide_closing_shift && menu_item == 0"
               >
-                <v-icon>{{ item.icon }}</v-icon>
-                <v-list-item-title>{{ item.text }}</v-list-item-title>
+                <v-icon class="mr-2">mdi-content-save-move-outline</v-icon>
+                <span>{{ __('Close Shift') }}</span>
+              </v-list-item>
+              <v-list-item
+                @click="print_last_invoice"
+                v-if="pos_profile.posa_allow_print_last_invoice && this.last_invoice"
+              >
+                <v-icon class="mr-2">mdi-printer</v-icon>
+                <span>{{ __('Print Last Invoice') }}</span>
+              </v-list-item>
+              <v-divider class="my-0"></v-divider>
+              <v-list-item @click="logOut">
+                <v-icon class="mr-2">mdi-logout</v-icon>
+                <span>{{ __('Logout') }}</span>
+              </v-list-item>
+              <v-list-item @click="go_about">
+                <v-icon class="mr-2">mdi-information-outline</v-icon>
+                <span>{{ __('About') }}</span>
               </v-list-item>
             </v-list>
           </v-card>
         </v-menu>
       </div>
     </v-app-bar>
-    <v-navigation-drawer v-model="drawer" app class="primary margen-top" width="170">
+    <v-navigation-drawer
+      v-model="drawer"
+      :mini-variant.sync="mini"
+      app
+      class="primary margen-top"
+      width="170"
+    >
       <v-list>
         <v-list-item class="px-2">
           <v-avatar>
             <v-img :src="company_img"></v-img>
           </v-avatar>
-
-          <v-list-item-title>{{ company }}</v-list-item-title>
-
+          <span class="ml-2">{{ company }}</span>
           <v-btn icon @click.stop="mini = !mini">
             <v-icon>mdi-chevron-left</v-icon>
           </v-btn>
         </v-list-item>
-        <v-divider></v-divider>
-        <v-list-item
-          v-for="(item, index) in items"
-          :key="index"
-          @click="changePage(item.text)"
-        >
-          <v-list-item-title><v-icon>{{ item.icon }}</v-icon> {{ item.text }}</v-list-item-title>
-        </v-list-item>
+        <v-list v-model="item">
+          <v-list-item
+            v-for="(listItem, index) in items"
+            :key="listItem.text"
+            @click="changePage(listItem.text)"
+          >
+            <v-icon class="mr-2">{{ listItem.icon }}</v-icon>
+            <span>{{ listItem.text }}</span>
+          </v-list-item>
+        </v-list>
       </v-list>
     </v-navigation-drawer>
-    <v-snackbar v-model="snack" :timeout="5000" :color="snackColor" location="top right">
+    <v-snackbar v-model="snack" :timeout="5000" :color="snackColor" top right>
       {{ snackText }}
     </v-snackbar>
     <v-dialog v-model="freeze" persistent max-width="290">
       <v-card>
-        <v-card-title>{{ freezeTitle }}</v-card-title>
+        <v-card-title class="text-h5">{{ freezeTitle }}</v-card-title>
         <v-card-text>{{ freezeMsg }}</v-card-text>
       </v-card>
     </v-dialog>
   </nav>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<script>
 import { evntBus } from '../bus';
 
-const drawer = ref(false);
-const mini = ref(true);
-const item = ref(0);
-const items = ref([{ text: 'POS', icon: 'mdi-network-pos' }]);
-const snack = ref(false);
-const snackColor = ref('');
-const snackText = ref('');
-const company = ref('POS Awesome');
-const company_img = ref('/assets/erpnext/images/erpnext-logo.svg');
-const pos_profile = ref('');
-const freeze = ref(false);
-const freezeTitle = ref('');
-const freezeMsg = ref('');
-const last_invoice = ref('');
-
-const changePage = (key) => {
-  evntBus.emit('changePage', key);
-};
-
-const go_desk = () => {
-  frappe.set_route('/');
-  location.reload();
-};
-
-const go_about = () => {
-  const win = window.open('https://github.com/yrestom/POS-Awesome', '_blank');
-  win.focus();
-};
-
-const close_shift_dialog = () => {
-  evntBus.emit('open_closing_dialog');
-};
-
-const show_mesage = (data) => {
-  snack.value = true;
-  snackColor.value = data.color;
-  snackText.value = data.text;
-};
-
-const logOut = () => {
-  frappe.call({
-    method: 'logout',
-    callback: function (r) {
-      if (r.exc) {
-        return;
-      }
-      frappe.set_route('/login');
+export default {
+  // components: {MyPopup},
+  data() {
+    return {
+      drawer: false,
+      mini: true,
+      item: 0,
+      items: [{ text: 'POS', icon: 'mdi-network-pos' }],
+      page: '',
+      fav: true,
+      menu: false,
+      message: false,
+      hints: true,
+      menu_item: 0,
+      snack: false,
+      snackColor: '',
+      snackText: '',
+      company: 'POS Awesome',
+      company_img: '/assets/erpnext/images/erpnext-logo.svg',
+      pos_profile: '',
+      freeze: false,
+      freezeTitle: '',
+      freezeMsg: '',
+      last_invoice: '',
+    };
+  },
+  methods: {
+    changePage(key) {
+      thi.emit('changePage', key);
+    },
+    go_desk() {
+      frappe.set_route('/');
       location.reload();
     },
-  });
-};
-
-const print_last_invoice = () => {
-  if (!last_invoice.value) return;
-  const print_format =
-    pos_profile.value.print_format_for_online || pos_profile.value.print_format;
-  const letter_head = pos_profile.value.letter_head || 0;
-  const url =
-    frappe.urllib.get_base_url() +
-    '/printview?doctype=Sales%20Invoice&name=' +
-    last_invoice.value +
-    '&trigger_print=1' +
-    '&format=' +
-    print_format +
-    '&no_letterhead=' +
-    letter_head;
-  const printWindow = window.open(url, 'Print');
-  printWindow.addEventListener(
-    'load',
-    function () {
-      printWindow.print();
+    go_about() {
+      const win = window.open(
+        'https://github.com/yrestom/POS-Awesome',
+        '_blank'
+      );
+      win.focus();
     },
-    true
-  );
+    close_shift_dialog() {
+      evntBus.emit('open_closing_dialog');
+    },
+    show_mesage(data) {
+      this.snack = true;
+      this.snackColor = data.color;
+      this.snackText = data.text;
+    },
+    logOut() {
+      var me = this;
+      me.logged_out = true;
+      return frappe.call({
+        method: 'logout',
+        callback: function (r) {
+          if (r.exc) {
+            return;
+          }
+          frappe.set_route('/login');
+          location.reload();
+        },
+      });
+    },
+    print_last_invoice() {
+      if (!this.last_invoice) return;
+      const print_format =
+        this.pos_profile.print_format_for_online ||
+        this.pos_profile.print_format;
+      const letter_head = this.pos_profile.letter_head || 0;
+      const url =
+        frappe.urllib.get_base_url() +
+        '/printview?doctype=Sales%20Invoice&name=' +
+        this.last_invoice +
+        '&trigger_print=1' +
+        '&format=' +
+        print_format +
+        '&no_letterhead=' +
+        letter_head;
+      const printWindow = window.open(url, 'Print');
+      printWindow.addEventListener(
+        'load',
+        function () {
+          printWindow.print();
+        },
+        true
+      );
+    },
+  },
+  created: function () {
+    this.$nextTick(function () {
+      evntBus.on('show_mesage', (data) => {
+        this.show_mesage(data);
+      });
+      evntBus.on('set_company', (data) => {
+        this.company = data.name;
+        this.company_img = data.company_logo
+          ? data.company_logo
+          : this.company_img;
+      });
+      evntBus.on('register_pos_profile', (data) => {
+        this.pos_profile = data.pos_profile;
+        const payments = { text: 'Payments', icon: 'mdi-cash-register' };
+        if (
+          this.pos_profile.posa_use_pos_awesome_payments &&
+          this.items.length !== 2
+        ) {
+          this.items.push(payments);
+        }
+      });
+      evntBus.on('set_last_invoice', (data) => {
+        this.last_invoice = data;
+      });
+      evntBus.on('freeze', (data) => {
+        this.freeze = true;
+        this.freezeTitle = data.title;
+        this.freezeMsg = data.msg;
+      });
+      evntBus.on('unfreeze', () => {
+        this.freeze = false;
+        this.freezTitle = '';
+        this.freezeMsg = '';
+      });
+    });
+  },
 };
-
-const menuItems = ref([
-  {
-    text: 'Close Shift',
-    icon: 'mdi-content-save-move-outline',
-    action: close_shift_dialog,
-    condition: !pos_profile.value.posa_hide_closing_shift,
-  },
-  {
-    text: 'Print Last Invoice',
-    icon: 'mdi-printer',
-    action: print_last_invoice,
-    condition: pos_profile.value.posa_allow_print_last_invoice && last_invoice.value,
-  },
-  {
-    text: 'Logout',
-    icon: 'mdi-logout',
-    action: logOut,
-  },
-  {
-    text: 'About',
-    icon: 'mdi-information-outline',
-    action: go_about,
-  },
-]);
-
-evntBus.on('show_mesage', show_mesage);
-evntBus.on('set_company', (data) => {
-  company.value = data.name;
-  company_img.value = data.company_logo ? data.company_logo : company_img.value;
-});
-evntBus.on('register_pos_profile', (data) => {
-  pos_profile.value = data.pos_profile;
-  const payments = { text: 'Payments', icon: 'mdi-cash-register' };
-  if (pos_profile.value.posa_use_pos_awesome_payments && items.value.length !== 2) {
-    items.value.push(payments);
-  }
-});
-evntBus.on('set_last_invoice', (data) => {
-  last_invoice.value = data;
-});
-evntBus.on('freeze', (data) => {
-  freeze.value = true;
-  freezeTitle.value = data.title;
-  freezeMsg.value = data.msg;
-});
-evntBus.on('unfreeze', () => {
-  freeze.value = false;
-  freezeTitle.value = '';
-  freezeMsg.value = '';
-});
 </script>
 
 <style scoped>
