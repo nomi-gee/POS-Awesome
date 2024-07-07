@@ -485,7 +485,7 @@
           >
             <v-switch
               v-model="is_credit_sale"
-              flat
+              variant="flat"
               :label="__('Is Credit Sale')"
               class="my-0 py-0"
             ></v-switch>
@@ -502,19 +502,14 @@
             ></v-switch>
           </v-col>
           <v-col cols="6" v-if="is_credit_sale">
-            <v-menu
-              ref="date_menu"
-              v-model="date_menu"
-              :close-on-content-click="false"
-              transition="scale-transition"
-            >
-              <template v-slot:activator="{ on, attrs }">
+            <v-menu ref="date_menu" v-model="date_menu" :close-on-content-click="false" transition="scale-transition">
+              <template v-slot:activator="{ props: { on, attrs } }">
                 <v-text-field
                   v-model="invoice_doc.due_date"
                   :label="__('Due Date')"
                   readonly
                   variant="outlined"
-                  dense
+                  density="compact"
                   hide-details
                   v-bind="attrs"
                   v-on="on"
@@ -523,13 +518,12 @@
               </template>
               <v-date-picker
                 v-model="invoice_doc.due_date"
-                no-title
+                :no-title="true"
                 scrollable
                 color="primary"
                 :min="frappe.datetime.now_date()"
-                @input="date_menu = false"
-              >
-              </v-date-picker>
+                @update:model-value="date_menu = false"
+              ></v-date-picker>
             </v-menu>
           </v-col>
           <v-col
@@ -728,7 +722,7 @@ export default {
     pos_settings: "",
     customer_info: "",
     mpesa_modes: [],
-    readonly: true,
+    readonly: false,
   }),
 
   methods: {
@@ -1436,6 +1430,7 @@ export default {
       }
     },
     is_credit_sale(value) {
+      console.log(this.invoice_doc);
       if (value == 1) {
         this.invoice_doc.payments.forEach((payment) => {
           payment.amount = 0;
