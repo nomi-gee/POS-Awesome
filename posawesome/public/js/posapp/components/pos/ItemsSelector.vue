@@ -87,7 +87,6 @@
                       {{ formtCurrency(item.rate) || 0 }}
                     </div>
                     <div class="text-caption golden--text">
-                      {{ formtFloat(item.actual_qty) || 0 }}
                       {{ item.stock_uom || "" }}
                     </div>
                   </v-card-text>
@@ -111,11 +110,6 @@
                       >{{ currencySymbol(item.currency) }}
                       {{ formtCurrency(item.rate) }}</span
                     >
-                  </template>
-                  <template v-slot:item.actual_qty="{ item }">
-                    <span class="golden--text">{{
-                      formtFloat(item.actual_qty)
-                    }}</span>
                   </template>
                 </v-data-table>
             </div>
@@ -316,7 +310,6 @@ export default {
           key: "item_code",
         },
         { title: __("Rate"), key: "rate", align: "start" },
-        { title: __("Available QTY"), key: "actual_qty", align: "start" },
         { title: __("UOM"), key: "stock_uom", align: "start" },
       ];
       if (!this.pos_profile.posa_display_item_code) {
