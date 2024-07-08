@@ -621,7 +621,7 @@ def submit_invoice(invoice, data):
     if frappe.get_value("POS Profile", invoice_doc.pos_profile, "posa_auto_set_batch"):
         set_batch_nos(invoice_doc, "warehouse", throw=True)
     set_batch_nos_for_bundels(invoice_doc, "warehouse", throw=True)
-
+    invoice_doc.cost_center = frappe.get_value("POS Profile", invoice_doc.pos_profile, "cost_center")
     invoice_doc.flags.ignore_permissions = True
     frappe.flags.ignore_account_permission = True
     invoice_doc.posa_is_printed = 1
